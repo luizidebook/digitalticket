@@ -1,0 +1,10 @@
+{
+  "name": "@digitalticket/web",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Frontend público e painel do DigitalTicket — servido pelo app fullstack principal durante a fundação.",
+  "dependencies": {
+    "@digitalticket/shared": "workspace:*",
+    "@digitalticket/ui": "workspace:*"
+  }
+}

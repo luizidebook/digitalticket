@@ -1,0 +1,49 @@
+# DigitalTicket — Project TODO
+
+- [x] Analisar `analise_doticket.md` e consolidar o fluxo prioritário da plataforma.
+- [x] Definir a arquitetura inicial como SaaS multi-tenant, white-label e orientado a eventos.
+- [x] Criar o repositório público `luizidebook/digitalticket` com o GitHub CLI e configurar o remote `origin`.
+- [x] Configurar monorepo pnpm com `apps/web`, `apps/api`, `apps/mobile`, `packages/shared` e `packages/ui`.
+- [ ] Adicionar configuração raiz de TypeScript, lint, formatação, testes e Turborepo.
+- [x] Adicionar `docker-compose.yml` com PostgreSQL para desenvolvimento local.
+- [ ] Documentar configuração, variáveis de ambiente e comandos no README.
+- [x] Modelar organizações/tenants com slug, domínio, logo, cores, tema e status.
+- [ ] Implementar resolução e isolamento de tenant em todas as consultas protegidas.
+- [x] Modelar usuários com papéis `SUPER_ADMIN`, `ORGANIZER` e `BUYER`.
+- [ ] Implementar cadastro, login, access token JWT, refresh token rotativo e logout.
+- [ ] Implementar middleware de autenticação e autorização baseada em papéis.
+- [ ] Implementar CRUD de eventos/produtos com tipo, categoria, tags, descrição, imagens, status e publicação.
+- [ ] Implementar datas únicas, múltiplas e produtos sem data definida.
+- [ ] Implementar CRUD de lotes com preço, capacidade, vigência e quantidade máxima por pedido.
+- [ ] Implementar reserva transacional de estoque para impedir overselling.
+- [ ] Modelar compradores, pedidos, itens, pagamentos, tickets, check-ins e cupons.
+- [ ] Implementar criação de pedido e cálculo seguro do total no backend.
+- [ ] Implementar adaptador Mercado Pago para PIX e cartão sem expor credenciais.
+- [ ] Implementar webhook Mercado Pago autenticado e idempotente.
+- [ ] Implementar emissão de um ticket por unidade comprada após pagamento aprovado.
+- [ ] Implementar token assinado e código alfanumérico únicos por ticket.
+- [ ] Implementar geração de QR Code do ingresso.
+- [ ] Implementar serviço de e-mail desacoplado para envio de voucher digital.
+- [ ] Implementar validação de check-in por QR Code ou código alfanumérico.
+- [ ] Implementar estados `ISSUED`, `VALIDATED`, `USED` e `CANCELLED` com histórico de entradas.
+- [ ] Configurar o app Expo para escaneamento de QR Code e consulta à API.
+- [x] Criar identidade visual escura, moderna e própria para o painel SaaS.
+- [ ] Implementar tokens de tema white-label por organizador no frontend público.
+- [ ] Criar páginas web de login e cadastro.
+- [ ] Criar dashboard do organizador com KPIs de vendas, receita e check-ins.
+- [ ] Criar tela de listagem e formulário de criação/edição de eventos.
+- [ ] Criar tela de gestão de lotes e capacidade.
+- [ ] Criar página pública white-label do evento com data, lote e quantidade.
+- [ ] Criar formulário do comprador com aceite de termos.
+- [ ] Criar interface de checkout PIX/cartão e estados de pagamento.
+- [ ] Criar área do comprador para visualizar ingressos e QR Codes.
+- [ ] Criar tela web de check-in rápido como alternativa ao app móvel.
+- [ ] Criar gestão de pedidos, clientes e cupons do organizador.
+- [ ] Criar relatórios exportáveis de vendas e check-ins.
+- [ ] Criar painel super-admin para organizações, taxas e KPIs consolidados.
+- [ ] Adicionar testes unitários para autenticação, tenancy, estoque, QR Code, webhook e check-in.
+- [ ] Adicionar testes de componentes e fluxos críticos do frontend.
+- [ ] Executar typecheck, lint, testes e builds de todas as aplicações.
+- [ ] Validar visualmente as páginas principais em desktop e mobile.
+- [ ] Criar commits incrementais por marco funcional e enviar ao GitHub.
+- [ ] Preparar documentação final com execução local, arquitetura e próximos passos.
