@@ -17,27 +17,27 @@
 - [ ] Implementar CRUD de lotes com preço, capacidade, vigência e quantidade máxima por pedido.
 - [ ] Implementar reserva transacional de estoque para impedir overselling.
 - [x] Modelar compradores, pedidos, itens, pagamentos, tickets, check-ins e cupons.
-- [ ] Implementar criação de pedido e cálculo seguro do total no backend.
-- [ ] Implementar adaptador Mercado Pago para PIX e cartão sem expor credenciais.
-- [ ] Implementar webhook Mercado Pago autenticado e idempotente.
-- [ ] Implementar emissão de um ticket por unidade comprada após pagamento aprovado.
-- [ ] Implementar token assinado e código alfanumérico únicos por ticket.
-- [ ] Implementar geração de QR Code do ingresso.
-- [ ] Implementar serviço de e-mail desacoplado para envio de voucher digital.
-- [ ] Implementar validação de check-in por QR Code ou código alfanumérico.
-- [ ] Implementar estados `ISSUED`, `VALIDATED`, `USED` e `CANCELLED` com histórico de entradas.
-- [ ] Configurar o app Expo para escaneamento de QR Code e consulta à API.
+- [x] Implementar criação de pedido e cálculo seguro do total no backend.
+- [x] Implementar adaptador Mercado Pago para PIX e cartão sem expor credenciais.
+- [x] Implementar webhook Mercado Pago autenticado e idempotente.
+- [x] Implementar emissão de um ticket por unidade comprada após pagamento aprovado.
+- [x] Implementar token assinado e código alfanumérico únicos por ticket.
+- [x] Implementar geração de QR Code do ingresso.
+- [x] Implementar serviço de e-mail desacoplado para envio de voucher digital.
+- [x] Implementar validação de check-in por QR Code ou código alfanumérico.
+- [x] Implementar estados `ISSUED`, `VALIDATED`, `USED` e `CANCELLED` com histórico de entradas.
+- [x] Configurar o app Expo para escaneamento de QR Code e consulta à API.
 - [x] Criar identidade visual escura, moderna e própria para o painel SaaS.
 - [ ] Implementar tokens de tema white-label por organizador no frontend público.
 - [ ] Criar páginas web de login e cadastro.
 - [ ] Criar dashboard do organizador com KPIs de vendas, receita e check-ins.
 - [ ] Criar tela de listagem e formulário de criação/edição de eventos.
 - [ ] Criar tela de gestão de lotes e capacidade.
-- [ ] Criar página pública white-label do evento com data, lote e quantidade.
-- [ ] Criar formulário do comprador com aceite de termos.
-- [ ] Criar interface de checkout PIX/cartão e estados de pagamento.
+- [x] Criar página pública white-label do evento com data, lote e quantidade.
+- [x] Criar formulário do comprador com aceite de termos.
+- [x] Criar interface de checkout PIX/cartão e estados de pagamento.
 - [ ] Criar área do comprador para visualizar ingressos e QR Codes.
-- [ ] Criar tela web de check-in rápido como alternativa ao app móvel.
+- [x] Criar tela web de check-in rápido como alternativa ao app móvel.
 - [ ] Criar gestão de pedidos, clientes e cupons do organizador.
 - [ ] Criar relatórios exportáveis de vendas e check-ins.
 - [ ] Criar painel super-admin para organizações, taxas e KPIs consolidados.
@@ -47,12 +47,18 @@
 - [ ] Validar visualmente as páginas principais em desktop e mobile.
 - [ ] Criar commits incrementais por marco funcional e enviar ao GitHub.
 - [ ] Preparar documentação final com execução local, arquitetura e próximos passos.
-- [ ] Integrar o SDK/API oficial do Mercado Pago para criar pagamentos PIX e cartão com idempotency key e external reference do pedido.
-- [ ] Consultar pagamentos no Mercado Pago e reconciliar seus estados no PostgreSQL sem confiar apenas no payload do webhook.
-- [ ] Persistir eventos de webhook Mercado Pago com assinatura validada e chave única para deduplicação durável.
-- [ ] Emitir um ticket por unidade de item somente após transição idempotente do pagamento para aprovado.
-- [ ] Gerar voucher digital com QR Code único, código alfanumérico e envio real por provedor SMTP configurável.
-- [ ] Criar endpoint persistente de check-in que bloqueie reutilização e grave operador, dispositivo, resultado e horário.
-- [ ] Conectar o app Expo ao endpoint real de check-in e tratar resultados aprovado, usado, cancelado e inválido.
-- [ ] Implementar checkout comprador em etapas com pedido, dados pessoais, pagamento, confirmação e acesso ao ticket.
-- [ ] Substituir os dados estáticos das páginas web prioritárias por chamadas autenticadas à API real.
+- [x] Integrar o SDK/API oficial do Mercado Pago para criar pagamentos PIX e cartão com idempotency key e external reference do pedido.
+- [x] Consultar pagamentos no Mercado Pago e reconciliar seus estados no PostgreSQL sem confiar apenas no payload do webhook.
+- [x] Persistir eventos de webhook Mercado Pago com assinatura validada e chave única para deduplicação durável.
+- [x] Emitir um ticket por unidade de item somente após transição idempotente do pagamento para aprovado.
+- [x] Gerar voucher digital com QR Code único, código alfanumérico e envio real por provedor SMTP configurável.
+- [x] Criar endpoint persistente de check-in que bloqueie reutilização e grave operador, dispositivo, resultado e horário.
+- [x] Conectar o app Expo ao endpoint real de check-in e tratar resultados aprovado, usado, cancelado e inválido.
+- [x] Implementar checkout comprador em etapas com pedido, dados pessoais, pagamento, confirmação e acesso ao ticket.
+- [x] Substituir os dados estáticos das páginas web prioritárias por chamadas autenticadas à API real.
+- [ ] Aplicar e verificar a migração Prisma/PostgreSQL do modelo WebhookEvent e confirmar a persistência de pagamentos, tickets e check-ins.
+- [ ] Assinar criptograficamente o token do ticket e validar a assinatura antes do check-in.
+- [ ] Implementar cancelamento persistente de ticket e teste da transição CANCELLED.
+- [ ] Conectar a tela web de check-in ao endpoint real e exibir estados aprovado, usado, cancelado e inválido.
+- [ ] Completar o checkout com área pós-compra, consulta de pedido e acesso aos tickets/QR Codes.
+- [ ] Adicionar testes de webhook, emissão de tickets e concorrência de check-in.

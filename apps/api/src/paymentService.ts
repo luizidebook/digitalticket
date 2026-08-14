@@ -26,12 +26,12 @@ async function issueTicketsForApprovedOrder(orderId: string) {
       for (let index = 0; index < missing; index += 1) {
         const secret = createTicketSecret();
         const checkInCode = `DT-${secret.rawToken.slice(0, 10).toUpperCase()}`;
-        ticketData.push({ itemId: item.id, rawToken: secret.rawToken, tokenHash: secret.tokenHash, checkInCode });
+        ticketData.push({ itemId: item.id, rawToken: secret.rawToken, signedToken: secret.signedToken, tokenHash: secret.tokenHash, checkInCode });
       }
     }
     for (const ticket of ticketData) {
       await tx.ticket.create({ data: { orderItemId: ticket.itemId, holderName: order.buyer.name, holderEmail: order.buyer.email, qrTokenHash: ticket.tokenHash, checkInCode: ticket.checkInCode } });
-      pendingEmails.push({ recipient: order.buyer.email, subject: `Seu ingresso — ${order.event.name}`, ticketQrDataUrl: await createTicketQrDataUrl(ticket.rawToken), checkInCode: ticket.checkInCode, holderName: order.buyer.name, eventName: order.event.name });
+      pendingEmails.push({ recipient: order.buyer.email, subject: `Seu ingresso — ${order.event.name}`, ticketQrDataUrl: await createTicketQrDataUrl(ticket.signedToken), checkInCode: ticket.checkInCode, holderName: order.buyer.name, eventName: order.event.name });
     }
     return tx.order.update({ where: { id: order.id }, data: { status: "PAID" }, include: { items: { include: { tickets: true } } } });
   });

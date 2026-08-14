@@ -1,5 +1,5 @@
 import QRCode from "qrcode";
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
 export type PaymentMethod = "PIX" | "CREDIT_CARD";
 export type PaymentIntent = { provider: "MERCADO_PAGO"; externalId: string; status: "PENDING" | "APPROVED" | "REJECTED" | "IN_PROCESS" | "REFUNDED"; method: PaymentMethod; amountCents: number; qrCode?: string; qrCodeBase64?: string; statusDetail?: string };
@@ -32,8 +32,10 @@ export class MercadoPagoGateway implements PaymentGateway {
   }
 }
 
-export function createTicketSecret() { const rawToken = randomBytes(32).toString("base64url"); return { rawToken, tokenHash: createHash("sha256").update(rawToken).digest("hex") }; }
-export async function createTicketQrDataUrl(rawToken: string) { return QRCode.toDataURL(`digitalticket://ticket/${rawToken}`, { width: 640, margin: 2, errorCorrectionLevel: "H" }); }
+const ticketSigningSecret = () => process.env.TICKET_SIGNING_SECRET ?? process.env.JWT_SECRET ?? "development-ticket-secret";
+export function createTicketSecret() { const rawToken = randomBytes(32).toString("base64url"); const signature = createHmac("sha256", ticketSigningSecret()).update(rawToken).digest("base64url"); return { rawToken, signedToken: `${rawToken}.${signature}`, tokenHash: createHash("sha256").update(rawToken).digest("hex") }; }
+export function verifyTicketToken(signedToken: string) { const [rawToken, signature] = signedToken.split("."); if (!rawToken || !signature) return null; const expected = createHmac("sha256", ticketSigningSecret()).update(rawToken).digest("base64url"); if (signature.length !== expected.length || !timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null; return rawToken; }
+export async function createTicketQrDataUrl(signedToken: string) { return QRCode.toDataURL(`digitalticket://ticket/${signedToken}`, { width: 640, margin: 2, errorCorrectionLevel: "H" }); }
 export interface VoucherMailer { sendVoucher(input: { recipient: string; subject: string; ticketQrDataUrl: string; checkInCode: string; holderName: string; eventName: string }): Promise<void>; }
 export class ConfiguredVoucherMailer implements VoucherMailer {
   async sendVoucher(input: { recipient: string; subject: string; ticketQrDataUrl: string; checkInCode: string; holderName: string; eventName: string }) {

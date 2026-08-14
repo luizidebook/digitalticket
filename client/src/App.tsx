@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import EventStudio from "./pages/EventStudio";
 import CheckIn from "./pages/CheckIn";
+import BuyerOrder from "./pages/BuyerOrder";
 import PublicEvent from "./pages/PublicEvent";
 
 function Router() {
@@ -15,7 +16,8 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/events/new"} component={EventStudio} />
-      <Route path={"/check-in"} component={CheckIn} />
+      <Route path="/check-in" component={CheckIn} />
+      <Route path="/buyer/orders/:orderId" component={BuyerOrder} />
       <Route path={"/event/demo"} component={PublicEvent} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
