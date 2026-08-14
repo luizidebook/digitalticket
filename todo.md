@@ -47,3 +47,12 @@
 - [ ] Validar visualmente as páginas principais em desktop e mobile.
 - [ ] Criar commits incrementais por marco funcional e enviar ao GitHub.
 - [ ] Preparar documentação final com execução local, arquitetura e próximos passos.
+- [ ] Integrar o SDK/API oficial do Mercado Pago para criar pagamentos PIX e cartão com idempotency key e external reference do pedido.
+- [ ] Consultar pagamentos no Mercado Pago e reconciliar seus estados no PostgreSQL sem confiar apenas no payload do webhook.
+- [ ] Persistir eventos de webhook Mercado Pago com assinatura validada e chave única para deduplicação durável.
+- [ ] Emitir um ticket por unidade de item somente após transição idempotente do pagamento para aprovado.
+- [ ] Gerar voucher digital com QR Code único, código alfanumérico e envio real por provedor SMTP configurável.
+- [ ] Criar endpoint persistente de check-in que bloqueie reutilização e grave operador, dispositivo, resultado e horário.
+- [ ] Conectar o app Expo ao endpoint real de check-in e tratar resultados aprovado, usado, cancelado e inválido.
+- [ ] Implementar checkout comprador em etapas com pedido, dados pessoais, pagamento, confirmação e acesso ao ticket.
+- [ ] Substituir os dados estáticos das páginas web prioritárias por chamadas autenticadas à API real.

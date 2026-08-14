@@ -51,30 +51,30 @@ model Organization {
 }
 
 model User {
-  id             String       @id @default(cuid())
+  id             String         @id @default(cuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization?  @relation(fields: [organizationId], references: [id])
   name           String
-  email          String       @unique
+  email          String         @unique
   passwordHash   String
-  role           Role         @default(BUYER)
+  role           Role           @default(BUYER)
   refreshTokens  RefreshToken[]
   orders         Order[]
   checkIns       CheckIn[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
   @@index([organizationId, role])
 }
 
 model RefreshToken {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tokenHash String   @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
   expiresAt DateTime
   revokedAt DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   @@index([userId, revokedAt])
 }
@@ -104,21 +104,21 @@ model Event {
 }
 
 model Lot {
-  id             String   @id @default(cuid())
-  eventId        String
-  event          Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  name           String
-  priceInCents   Int
-  capacity       Int
-  sold           Int      @default(0)
-  saleStartsAt   DateTime?
-  saleEndsAt     DateTime?
-  maxPerOrder    Int      @default(10)
-  sortOrder      Int      @default(0)
-  active         Boolean  @default(true)
-  orderItems     OrderItem[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id           String      @id @default(cuid())
+  eventId      String
+  event        Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name         String
+  priceInCents Int
+  capacity     Int
+  sold         Int         @default(0)
+  saleStartsAt DateTime?
+  saleEndsAt   DateTime?
+  maxPerOrder  Int         @default(10)
+  sortOrder    Int         @default(0)
+  active       Boolean     @default(true)
+  orderItems   OrderItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
   @@index([eventId, active, sortOrder])
 }
@@ -142,36 +142,48 @@ model Coupon {
 }
 
 model Order {
-  id             String        @id @default(cuid())
+  id             String       @id @default(cuid())
   organizationId String
-  organization   Organization  @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
   buyerId        String
-  buyer          User          @relation(fields: [buyerId], references: [id])
+  buyer          User         @relation(fields: [buyerId], references: [id])
   eventId        String
-  event          Event         @relation(fields: [eventId], references: [id])
+  event          Event        @relation(fields: [eventId], references: [id])
   couponId       String?
-  coupon         Coupon?       @relation(fields: [couponId], references: [id])
-  status         String         @default("PENDING_PAYMENT")
+  coupon         Coupon?      @relation(fields: [couponId], references: [id])
+  status         String       @default("PENDING_PAYMENT")
   subtotalCents  Int
-  discountCents  Int            @default(0)
+  discountCents  Int          @default(0)
   totalCents     Int
   payment        Payment?
   items          OrderItem[]
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   @@index([organizationId, status, createdAt])
 }
 
 model OrderItem {
-  id           String   @id @default(cuid())
-  orderId      String
-  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  lotId        String
-  lot          Lot      @relation(fields: [lotId], references: [id])
-  quantity     Int
+  id             String   @id @default(cuid())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  lotId          String
+  lot            Lot      @relation(fields: [lotId], references: [id])
+  quantity       Int
   unitPriceCents Int
-  tickets      Ticket[]
+  tickets        Ticket[]
+}
+
+model WebhookEvent {
+  id          String    @id @default(cuid())
+  provider    String
+  externalId  String
+  eventType   String?
+  payload     Json
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@unique([provider, externalId])
 }
 
 model Payment {
@@ -189,19 +201,19 @@ model Payment {
 }
 
 model Ticket {
-  id           String       @id @default(cuid())
-  orderItemId  String
-  orderItem    OrderItem    @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
-  holderName   String
-  holderEmail  String
-  qrTokenHash  String       @unique
-  checkInCode  String       @unique
-  status       TicketStatus @default(ISSUED)
-  checkIns     CheckIn[]
-  issuedAt     DateTime     @default(now())
-  validatedAt  DateTime?
-  usedAt       DateTime?
-  cancelledAt  DateTime?
+  id          String       @id @default(cuid())
+  orderItemId String
+  orderItem   OrderItem    @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  holderName  String
+  holderEmail String
+  qrTokenHash String       @unique
+  checkInCode String       @unique
+  status      TicketStatus @default(ISSUED)
+  checkIns    CheckIn[]
+  issuedAt    DateTime     @default(now())
+  validatedAt DateTime?
+  usedAt      DateTime?
+  cancelledAt DateTime?
 }
 
 model CheckIn {

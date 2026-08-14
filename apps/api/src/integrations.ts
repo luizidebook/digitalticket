@@ -2,55 +2,43 @@ import QRCode from "qrcode";
 import { createHash, randomBytes } from "node:crypto";
 
 export type PaymentMethod = "PIX" | "CREDIT_CARD";
+export type PaymentIntent = { provider: "MERCADO_PAGO"; externalId: string; status: "PENDING" | "APPROVED" | "REJECTED" | "IN_PROCESS" | "REFUNDED"; method: PaymentMethod; amountCents: number; qrCode?: string; qrCodeBase64?: string; statusDetail?: string };
+type MercadoPagoPayment = { id: number; status: string; status_detail?: string; transaction_amount: number; payment_method_id?: string; point_of_interaction?: { transaction_data?: { qr_code?: string; qr_code_base64?: string } } };
 
-export type PaymentIntent = {
-  provider: "MERCADO_PAGO";
-  externalId: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
-  method: PaymentMethod;
-  amountCents: number;
-  qrCode?: string;
-  qrCodeBase64?: string;
-};
+function paymentStatus(status: string): PaymentIntent["status"] { if (status === "approved") return "APPROVED"; if (["rejected", "cancelled", "charged_back"].includes(status)) return "REJECTED"; if (status === "refunded") return "REFUNDED"; return "IN_PROCESS"; }
 
-export interface PaymentGateway {
-  createPayment(input: { orderId: string; amountCents: number; method: PaymentMethod; payerEmail: string }): Promise<PaymentIntent>;
-  getPayment(externalId: string): Promise<PaymentIntent>;
-}
+export interface PaymentGateway { createPayment(input: { orderId: string; amountCents: number; method: PaymentMethod; payerEmail: string; card?: { token: string; installments: number; paymentMethodId: string; issuerId?: string } }): Promise<PaymentIntent>; getPayment(externalId: string): Promise<PaymentIntent>; }
 
 export class MercadoPagoGateway implements PaymentGateway {
-  async createPayment(input: { orderId: string; amountCents: number; method: PaymentMethod; payerEmail: string }): Promise<PaymentIntent> {
-    if (!process.env.MERCADO_PAGO_ACCESS_TOKEN) {
-      throw new Error("MERCADO_PAGO_ACCESS_TOKEN_NOT_CONFIGURED");
-    }
-    throw new Error(`MERCADO_PAGO_ADAPTER_READY:${input.orderId}`);
+  private readonly accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  private readonly baseUrl = process.env.MERCADO_PAGO_API_URL ?? "https://api.mercadopago.com";
+  private async request<T>(path: string, init: RequestInit & { idempotencyKey?: string } = {}): Promise<T> {
+    if (!this.accessToken) throw new Error("MERCADO_PAGO_ACCESS_TOKEN_NOT_CONFIGURED");
+    const headers = new Headers(init.headers); headers.set("Authorization", `Bearer ${this.accessToken}`); headers.set("Content-Type", "application/json");
+    if (init.idempotencyKey) headers.set("X-Idempotency-Key", init.idempotencyKey);
+    const response = await fetch(`${this.baseUrl}${path}`, { ...init, headers }); const body = await response.text(); const data = body ? JSON.parse(body) : null;
+    if (!response.ok) throw new Error(`MERCADO_PAGO_${response.status}:${JSON.stringify(data)}`); return data as T;
   }
-
+  async createPayment(input: { orderId: string; amountCents: number; method: PaymentMethod; payerEmail: string; card?: { token: string; installments: number; paymentMethodId: string; issuerId?: string } }): Promise<PaymentIntent> {
+    const payload: Record<string, unknown> = { transaction_amount: input.amountCents / 100, description: `DigitalTicket ${input.orderId}`, payer: { email: input.payerEmail }, external_reference: input.orderId, notification_url: process.env.MERCADO_PAGO_WEBHOOK_URL };
+    if (input.method === "PIX") payload.payment_method_id = "pix"; else { if (!input.card) throw new Error("CARD_DETAILS_REQUIRED"); Object.assign(payload, { token: input.card.token, installments: input.card.installments, payment_method_id: input.card.paymentMethodId, issuer_id: input.card.issuerId }); }
+    const data = await this.request<MercadoPagoPayment>("/v1/payments", { method: "POST", body: JSON.stringify(payload), idempotencyKey: `digitalticket-order-${input.orderId}` });
+    const tx = data.point_of_interaction?.transaction_data;
+    return { provider: "MERCADO_PAGO", externalId: String(data.id), status: paymentStatus(data.status), method: input.method, amountCents: Math.round(data.transaction_amount * 100), qrCode: tx?.qr_code, qrCodeBase64: tx?.qr_code_base64, statusDetail: data.status_detail };
+  }
   async getPayment(externalId: string): Promise<PaymentIntent> {
-    if (!process.env.MERCADO_PAGO_ACCESS_TOKEN) {
-      throw new Error("MERCADO_PAGO_ACCESS_TOKEN_NOT_CONFIGURED");
-    }
-    throw new Error(`MERCADO_PAGO_ADAPTER_READY:${externalId}`);
+    const data = await this.request<MercadoPagoPayment>(`/v1/payments/${encodeURIComponent(externalId)}`); const tx = data.point_of_interaction?.transaction_data;
+    return { provider: "MERCADO_PAGO", externalId: String(data.id), status: paymentStatus(data.status), method: data.payment_method_id === "pix" ? "PIX" : "CREDIT_CARD", amountCents: Math.round(data.transaction_amount * 100), qrCode: tx?.qr_code, qrCodeBase64: tx?.qr_code_base64, statusDetail: data.status_detail };
   }
 }
 
-export function createTicketSecret() {
-  const rawToken = randomBytes(32).toString("base64url");
-  return { rawToken, tokenHash: createHash("sha256").update(rawToken).digest("hex") };
-}
-
-export async function createTicketQrDataUrl(rawToken: string) {
-  return QRCode.toDataURL(`digitalticket://ticket/${rawToken}`, { width: 640, margin: 2, errorCorrectionLevel: "H" });
-}
-
-export interface VoucherMailer {
-  sendVoucher(input: { recipient: string; subject: string; ticketQrDataUrl: string; checkInCode: string }): Promise<void>;
-}
-
+export function createTicketSecret() { const rawToken = randomBytes(32).toString("base64url"); return { rawToken, tokenHash: createHash("sha256").update(rawToken).digest("hex") }; }
+export async function createTicketQrDataUrl(rawToken: string) { return QRCode.toDataURL(`digitalticket://ticket/${rawToken}`, { width: 640, margin: 2, errorCorrectionLevel: "H" }); }
+export interface VoucherMailer { sendVoucher(input: { recipient: string; subject: string; ticketQrDataUrl: string; checkInCode: string; holderName: string; eventName: string }): Promise<void>; }
 export class ConfiguredVoucherMailer implements VoucherMailer {
-  async sendVoucher(input: { recipient: string; subject: string; ticketQrDataUrl: string; checkInCode: string }) {
-    if (!process.env.MAIL_FROM) {
-      throw new Error(`MAILER_NOT_CONFIGURED:${input.recipient}`);
-    }
+  async sendVoucher(input: { recipient: string; subject: string; ticketQrDataUrl: string; checkInCode: string; holderName: string; eventName: string }) {
+    if (!process.env.MAIL_FROM || !process.env.SMTP_URL) throw new Error("MAILER_NOT_CONFIGURED");
+    const { default: nodemailer } = await import("nodemailer"); const transport = nodemailer.createTransport(process.env.SMTP_URL);
+    await transport.sendMail({ from: process.env.MAIL_FROM, to: input.recipient, subject: input.subject, text: `Olá ${input.holderName}, seu ingresso para ${input.eventName} está disponível. Código: ${input.checkInCode}`, html: `<p>Olá ${input.holderName},</p><p>Seu ingresso para <strong>${input.eventName}</strong> está disponível.</p><p>Código de entrada: <strong>${input.checkInCode}</strong></p><img alt="QR Code do ingresso" src="${input.ticketQrDataUrl}" />` });
   }
 }
