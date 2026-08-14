@@ -10,12 +10,12 @@
 - [x] Modelar organizações/tenants com slug, domínio, logo, cores, tema e status.
 - [ ] Implementar resolução e isolamento de tenant em todas as consultas protegidas.
 - [x] Modelar usuários com papéis `SUPER_ADMIN`, `ORGANIZER` e `BUYER`.
-- [ ] Implementar cadastro, login, access token JWT, refresh token rotativo e logout.
-- [ ] Implementar middleware de autenticação e autorização baseada em papéis.
-- [ ] Implementar CRUD de eventos/produtos com tipo, categoria, tags, descrição, imagens, status e publicação.
+- [x] Implementar cadastro, login, access token JWT, refresh token rotativo e logout.
+- [x] Implementar middleware de autenticação e autorização baseada em papéis.
+- [x] Implementar CRUD de eventos/produtos com tipo, categoria, tags, descrição, imagens, status e publicação.
 - [ ] Implementar datas únicas, múltiplas e produtos sem data definida.
-- [ ] Implementar CRUD de lotes com preço, capacidade, vigência e quantidade máxima por pedido.
-- [ ] Implementar reserva transacional de estoque para impedir overselling.
+- [x] Implementar CRUD de lotes com preço, capacidade, vigência e quantidade máxima por pedido.
+- [x] Implementar reserva transacional de estoque para impedir overselling.
 - [x] Modelar compradores, pedidos, itens, pagamentos, tickets, check-ins e cupons.
 - [x] Implementar criação de pedido e cálculo seguro do total no backend.
 - [x] Implementar adaptador Mercado Pago para PIX e cartão sem expor credenciais.
@@ -36,7 +36,7 @@
 - [x] Criar página pública white-label do evento com data, lote e quantidade.
 - [x] Criar formulário do comprador com aceite de termos.
 - [x] Criar interface de checkout PIX/cartão e estados de pagamento.
-- [ ] Criar área do comprador para visualizar ingressos e QR Codes.
+- [x] Criar área do comprador para visualizar ingressos e QR Codes.
 - [x] Criar tela web de check-in rápido como alternativa ao app móvel.
 - [ ] Criar gestão de pedidos, clientes e cupons do organizador.
 - [ ] Criar relatórios exportáveis de vendas e check-ins.
@@ -45,8 +45,8 @@
 - [ ] Adicionar testes de componentes e fluxos críticos do frontend.
 - [ ] Executar typecheck, lint, testes e builds de todas as aplicações.
 - [ ] Validar visualmente as páginas principais em desktop e mobile.
-- [ ] Criar commits incrementais por marco funcional e enviar ao GitHub.
-- [ ] Preparar documentação final com execução local, arquitetura e próximos passos.
+- [x] Criar commits incrementais por marco funcional e enviar ao GitHub.
+- [x] Preparar documentação final com execução local, arquitetura e próximos passos.
 - [x] Integrar o SDK/API oficial do Mercado Pago para criar pagamentos PIX e cartão com idempotency key e external reference do pedido.
 - [x] Consultar pagamentos no Mercado Pago e reconciliar seus estados no PostgreSQL sem confiar apenas no payload do webhook.
 - [x] Persistir eventos de webhook Mercado Pago com assinatura validada e chave única para deduplicação durável.
@@ -57,8 +57,8 @@
 - [x] Implementar checkout comprador em etapas com pedido, dados pessoais, pagamento, confirmação e acesso ao ticket.
 - [x] Substituir os dados estáticos das páginas web prioritárias por chamadas autenticadas à API real.
 - [ ] Aplicar e verificar a migração Prisma/PostgreSQL do modelo WebhookEvent e confirmar a persistência de pagamentos, tickets e check-ins.
-- [ ] Assinar criptograficamente o token do ticket e validar a assinatura antes do check-in.
-- [ ] Implementar cancelamento persistente de ticket e teste da transição CANCELLED.
-- [ ] Conectar a tela web de check-in ao endpoint real e exibir estados aprovado, usado, cancelado e inválido.
-- [ ] Completar o checkout com área pós-compra, consulta de pedido e acesso aos tickets/QR Codes.
+- [x] Assinar criptograficamente o token do ticket e validar a assinatura antes do check-in.
+- [x] Implementar cancelamento persistente de ticket e teste da transição CANCELLED.
+- [x] Conectar a tela web de check-in ao endpoint real e exibir estados aprovado, usado, cancelado e inválido.
+- [x] Completar o checkout com área pós-compra, consulta de pedido e acesso aos tickets/QR Codes.
 - [ ] Adicionar testes de webhook, emissão de tickets e concorrência de check-in.

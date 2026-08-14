@@ -23,3 +23,10 @@ describe("MercadoPagoGateway", () => {
     await expect(new MercadoPagoGateway().getPayment("456")).resolves.toMatchObject({ externalId: "456", status: "APPROVED", method: "CREDIT_CARD", amountCents: 10000 });
   });
 });
+
+  it("signs and verifies ticket tokens while rejecting tampering", async () => {
+    const { createTicketSecret, verifyTicketToken } = await import("./integrations");
+    const secret = createTicketSecret();
+    expect(verifyTicketToken(secret.signedToken)).toBe(secret.rawToken);
+    expect(verifyTicketToken(`${secret.rawToken}.tampered`)).toBeNull();
+  });

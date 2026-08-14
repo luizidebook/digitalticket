@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import type { Request, Response, Router } from "express";
 import { z } from "zod";
+import QRCode from "qrcode";
 import { authenticateRequest } from "./authRoutes";
 import { createPendingOrder } from "./orderService";
 import { createMercadoPagoPayment, reconcileMercadoPagoPayment } from "./paymentService";
@@ -34,6 +35,8 @@ export function registerPaymentRoutes(router: Router) {
     const order = await prisma.order.findFirst({ where: { id: req.params.orderId, buyerId: session.userId }, include: { payment: true, event: true, items: { include: { tickets: true, lot: true } } } });
     if (!order) return res.status(404).json({ error: "ORDER_NOT_FOUND" });
     if (order.payment?.externalId && ["PENDING", "IN_PROCESS"].includes(order.payment.status)) { try { await reconcileMercadoPagoPayment(order.payment.externalId); } catch (error) { console.error("[Payment] status refresh failed", error); } }
-    return res.json(await prisma.order.findUnique({ where: { id: order.id }, include: { payment: true, event: true, items: { include: { tickets: true, lot: true } } } }));
+    const finalOrder = await prisma.order.findUnique({ where: { id: order.id }, include: { payment: true, event: true, items: { include: { tickets: true, lot: true } } } });
+    if (!finalOrder) return res.status(404).json({ error: "ORDER_NOT_FOUND" });
+    return res.json({ ...finalOrder, items: await Promise.all(finalOrder.items.map(async (item) => ({ ...item, tickets: await Promise.all(item.tickets.map(async (ticket) => ({ ...ticket, qrCodeDataUrl: await QRCode.toDataURL(`digitalticket://ticket/${ticket.checkInCode}`, { width: 320, margin: 1 }) }))) }))) });
   });
 }
