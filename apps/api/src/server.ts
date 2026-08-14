@@ -1,11 +1,13 @@
 import express from "express";
 import { mercadoPagoWebhook } from "./webhooks";
 import { registerAuthRoutes } from "./authRoutes";
+import { registerEventRoutes } from "./eventRoutes";
 
 const app = express();
 app.use(express.json());
 app.post("/api/webhooks/mercado-pago", mercadoPagoWebhook);
 registerAuthRoutes(app);
+registerEventRoutes(app);
 
 app.get("/health", (_req, res) => {
   res.json({ service: "digitalticket-api", status: "ok", version: "0.1.0" });
