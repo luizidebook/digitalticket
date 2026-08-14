@@ -4,9 +4,9 @@
 - [x] Definir a arquitetura inicial como SaaS multi-tenant, white-label e orientado a eventos.
 - [x] Criar o repositório público `luizidebook/digitalticket` com o GitHub CLI e configurar o remote `origin`.
 - [x] Configurar monorepo pnpm com `apps/web`, `apps/api`, `apps/mobile`, `packages/shared` e `packages/ui`.
-- [ ] Adicionar configuração raiz de TypeScript, lint, formatação, testes e Turborepo.
+- [x] Adicionar configuração raiz de TypeScript, lint, formatação, testes e Turborepo.
 - [x] Adicionar `docker-compose.yml` com PostgreSQL para desenvolvimento local.
-- [ ] Documentar configuração, variáveis de ambiente e comandos no README.
+- [x] Documentar configuração, variáveis de ambiente e comandos no README.
 - [x] Modelar organizações/tenants com slug, domínio, logo, cores, tema e status.
 - [ ] Implementar resolução e isolamento de tenant em todas as consultas protegidas.
 - [x] Modelar usuários com papéis `SUPER_ADMIN`, `ORGANIZER` e `BUYER`.
@@ -16,7 +16,7 @@
 - [ ] Implementar datas únicas, múltiplas e produtos sem data definida.
 - [ ] Implementar CRUD de lotes com preço, capacidade, vigência e quantidade máxima por pedido.
 - [ ] Implementar reserva transacional de estoque para impedir overselling.
-- [ ] Modelar compradores, pedidos, itens, pagamentos, tickets, check-ins e cupons.
+- [x] Modelar compradores, pedidos, itens, pagamentos, tickets, check-ins e cupons.
 - [ ] Implementar criação de pedido e cálculo seguro do total no backend.
 - [ ] Implementar adaptador Mercado Pago para PIX e cartão sem expor credenciais.
 - [ ] Implementar webhook Mercado Pago autenticado e idempotente.
