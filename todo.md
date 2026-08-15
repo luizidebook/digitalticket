@@ -8,7 +8,7 @@
 - [x] Adicionar `docker-compose.yml` com PostgreSQL para desenvolvimento local.
 - [x] Documentar configuração, variáveis de ambiente e comandos no README.
 - [x] Modelar organizações/tenants com slug, domínio, logo, cores, tema e status.
-- [ ] Implementar resolução e isolamento de tenant em todas as consultas protegidas.
+- [x] Implementar resolução e isolamento de tenant em todas as consultas protegidas.
 - [x] Modelar usuários com papéis `SUPER_ADMIN`, `ORGANIZER` e `BUYER`.
 - [x] Implementar cadastro, login, access token JWT, refresh token rotativo e logout.
 - [x] Implementar middleware de autenticação e autorização baseada em papéis.
@@ -28,9 +28,9 @@
 - [x] Implementar estados `ISSUED`, `VALIDATED`, `USED` e `CANCELLED` com histórico de entradas.
 - [x] Configurar o app Expo para escaneamento de QR Code e consulta à API.
 - [x] Criar identidade visual escura, moderna e própria para o painel SaaS.
-- [ ] Implementar tokens de tema white-label por organizador no frontend público.
+- [x] Implementar tokens de tema white-label por organizador no frontend público.
 - [ ] Criar páginas web de login e cadastro.
-- [ ] Criar dashboard do organizador com KPIs de vendas, receita e check-ins.
+- [x] Criar dashboard do organizador com KPIs de vendas, receita e check-ins.
 - [ ] Criar tela de listagem e formulário de criação/edição de eventos.
 - [ ] Criar tela de gestão de lotes e capacidade.
 - [x] Criar página pública white-label do evento com data, lote e quantidade.
@@ -38,12 +38,12 @@
 - [x] Criar interface de checkout PIX/cartão e estados de pagamento.
 - [x] Criar área do comprador para visualizar ingressos e QR Codes.
 - [x] Criar tela web de check-in rápido como alternativa ao app móvel.
-- [ ] Criar gestão de pedidos, clientes e cupons do organizador.
-- [ ] Criar relatórios exportáveis de vendas e check-ins.
-- [ ] Criar painel super-admin para organizações, taxas e KPIs consolidados.
-- [ ] Adicionar testes unitários para autenticação, tenancy, estoque, QR Code, webhook e check-in.
+- [x] Criar gestão de pedidos, clientes e cupons do organizador.
+- [x] Criar relatórios exportáveis de vendas e check-ins.
+- [x] Criar painel super-admin para organizações, taxas e KPIs consolidados.
+- [x] Adicionar testes unitários para autenticação, tenancy, estoque, QR Code, webhook e check-in.
 - [ ] Adicionar testes de componentes e fluxos críticos do frontend.
-- [ ] Executar typecheck, lint, testes e builds de todas as aplicações.
+- [x] Executar typecheck, lint, testes e builds de todas as aplicações.
 - [ ] Validar visualmente as páginas principais em desktop e mobile.
 - [x] Criar commits incrementais por marco funcional e enviar ao GitHub.
 - [x] Preparar documentação final com execução local, arquitetura e próximos passos.
@@ -56,7 +56,7 @@
 - [x] Conectar o app Expo ao endpoint real de check-in e tratar resultados aprovado, usado, cancelado e inválido.
 - [x] Implementar checkout comprador em etapas com pedido, dados pessoais, pagamento, confirmação e acesso ao ticket.
 - [x] Substituir os dados estáticos das páginas web prioritárias por chamadas autenticadas à API real.
-- [ ] Aplicar e verificar a migração Prisma/PostgreSQL do modelo WebhookEvent e confirmar a persistência de pagamentos, tickets e check-ins.
+- [x] Aplicar e verificar a migração Prisma/PostgreSQL do modelo WebhookEvent e confirmar a persistência de pagamentos, tickets e check-ins.
 - [x] Assinar criptograficamente o token do ticket e validar a assinatura antes do check-in.
 - [x] Implementar cancelamento persistente de ticket e teste da transição CANCELLED.
 - [x] Conectar a tela web de check-in ao endpoint real e exibir estados aprovado, usado, cancelado e inválido.
