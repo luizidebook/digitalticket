@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authenticateRequest } from "./authRoutes";
 import { assertAllowedRole } from "./tenant";
 import { couponInputSchema, couponUpdateSchema, validateCoupon } from "./coupons";
+import { ConfiguredWhatsAppSender, normalizeBrazilianPhone } from "./integrations";
 
 const prisma = new PrismaClient();
 
@@ -142,6 +143,30 @@ export function registerManagementRoutes(router: Router) {
     }
     await prisma.coupon.delete({ where: { id: coupon.id } });
     return res.status(204).send();
+  });
+
+  router.post("/api/v1/manage/orders/:orderId/send-whatsapp", async (req, res) => {
+    const session = await organizer(req, res); if (!session) return;
+    const organizationId = tenantFilter(session, req.body ?? {});
+    const phone = z.string().trim().min(10).max(20).safeParse(req.body?.phone);
+    if (!phone.success) return res.status(400).json({ error: "INVALID_PHONE" });
+    try { normalizeBrazilianPhone(phone.data); } catch { return res.status(400).json({ error: "INVALID_PHONE" }); }
+    const order = await prisma.order.findFirst({
+      where: { id: req.params.orderId, status: "PAID", ...(organizationId ? { organizationId } : {}) },
+      include: { buyer: { select: { name: true } }, event: { select: { name: true } }, items: { include: { tickets: { select: { checkInCode: true } } } } },
+    });
+    if (!order) return res.status(404).json({ error: "ORDER_NOT_FOUND_OR_NOT_PAID" });
+    const codes = order.items.flatMap((item) => item.tickets.map((ticket) => ticket.checkInCode));
+    if (!codes.length) return res.status(409).json({ error: "ORDER_HAS_NO_TICKETS" });
+    const sender = new ConfiguredWhatsAppSender();
+    try {
+      const orderUrl = process.env.PUBLIC_WEB_URL ? `${process.env.PUBLIC_WEB_URL}/buyer/orders/${order.id}` : undefined;
+      await sender.sendVoucher({ phone: phone.data, holderName: order.buyer.name, eventName: order.event.name, checkInCode: codes.join(", "), orderUrl });
+      return res.json({ sent: true, tickets: codes.length });
+    } catch (error: any) {
+      if (String(error?.message).includes("WHATSAPP_NOT_CONFIGURED")) return res.status(503).json({ error: "WHATSAPP_NOT_CONFIGURED" });
+      return res.status(502).json({ error: "WHATSAPP_DELIVERY_FAILED" });
+    }
   });
 
   router.post("/api/v1/public/coupons/validate", async (req, res) => {

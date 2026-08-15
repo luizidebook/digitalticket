@@ -56,6 +56,7 @@ model User {
   organization   Organization?  @relation(fields: [organizationId], references: [id])
   name           String
   email          String         @unique
+  phone          String?
   passwordHash   String
   role           Role           @default(BUYER)
   refreshTokens  RefreshToken[]

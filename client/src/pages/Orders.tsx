@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Loader2, Search, Ticket } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, MessageCircle, Search, Ticket } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "";
@@ -33,6 +33,10 @@ export default function Orders() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
+  const [whatsAppOrder, setWhatsAppOrder] = useState<OrderRow | null>(null);
+  const [whatsAppPhone, setWhatsAppPhone] = useState("");
+  const [whatsAppBusy, setWhatsAppBusy] = useState(false);
+  const [whatsAppResult, setWhatsAppResult] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!token) { setLoading(false); return; }
@@ -49,6 +53,17 @@ export default function Orders() {
   }, [token, page, search, status]);
 
   useEffect(() => { const timer = setTimeout(() => void load(), 300); return () => clearTimeout(timer); }, [load]);
+
+  const sendWhatsApp = async () => {
+    if (!whatsAppOrder) return;
+    setWhatsAppBusy(true); setWhatsAppResult(null);
+    try {
+      const response = await fetch(`${API_URL}/api/v1/manage/orders/${whatsAppOrder.id}/send-whatsapp`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ phone: whatsAppPhone }) });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.error === "WHATSAPP_NOT_CONFIGURED" ? "WhatsApp não configurado no servidor (WHATSAPP_ACCESS_TOKEN/WHATSAPP_PHONE_NUMBER_ID)." : body?.error ?? "REQUEST_FAILED");
+      setWhatsAppResult(`Enviado: ${body.tickets} ingresso(s).`);
+    } catch (err: any) { setWhatsAppResult(err.message); } finally { setWhatsAppBusy(false); }
+  };
 
   if (!token) return <main className="grid min-h-screen place-items-center bg-[#080a12] text-slate-400">Entre como organizador para gerenciar pedidos.</main>;
 
@@ -95,7 +110,12 @@ export default function Orders() {
                       <td className="px-5 py-4 text-slate-400">{order.items.map((item) => `${item.quantity}× ${item.lot.name}`).join(", ")}{order.coupon && <Badge className="ml-2 border-fuchsia-400/30 bg-fuchsia-400/10 text-fuchsia-300">{order.coupon.code}</Badge>}</td>
                       <td className="px-5 py-4 text-slate-400">{order.payment ? `${order.payment.method} · ${order.payment.status}` : "—"}</td>
                       <td className="px-5 py-4"><p className="font-semibold text-slate-100">{formatBRL(order.totalCents)}</p>{order.discountCents > 0 && <p className="text-xs text-emerald-400">-{formatBRL(order.discountCents)}</p>}</td>
-                      <td className="px-5 py-4"><Badge className={STATUS_LABEL[order.status]?.className ?? "border-white/10 bg-white/5 text-slate-300"}>{STATUS_LABEL[order.status]?.label ?? order.status}</Badge></td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          <Badge className={STATUS_LABEL[order.status]?.className ?? "border-white/10 bg-white/5 text-slate-300"}>{STATUS_LABEL[order.status]?.label ?? order.status}</Badge>
+                          {order.status === "PAID" && <button onClick={() => { setWhatsAppOrder(order); setWhatsAppPhone(""); setWhatsAppResult(null); }} className="rounded-lg p-1.5 text-slate-500 hover:bg-emerald-500/10 hover:text-emerald-400" title="Enviar ingressos por WhatsApp"><MessageCircle className="h-4 w-4" /></button>}
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -109,6 +129,20 @@ export default function Orders() {
             <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => setPage(page - 1)} className="border-white/15 bg-white/5 text-white"><ChevronLeft className="h-4 w-4" /></Button>
             <span className="text-sm text-slate-500">Página {page} de {totalPages}</span>
             <Button size="sm" variant="outline" disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="border-white/15 bg-white/5 text-white"><ChevronRight className="h-4 w-4" /></Button>
+          </div>
+        )}
+        {whatsAppOrder && (
+          <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 px-6" onClick={() => setWhatsAppOrder(null)}>
+            <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#111522] p-6" onClick={(e) => e.stopPropagation()}>
+              <h2 className="text-lg font-semibold">Enviar por WhatsApp</h2>
+              <p className="mt-1 text-sm text-slate-500">Pedido #{whatsAppOrder.id.slice(-8)} · {whatsAppOrder.buyer.name}</p>
+              <input value={whatsAppPhone} onChange={(e) => setWhatsAppPhone(e.target.value)} placeholder="(71) 99999-1234" className="mt-4 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm outline-none focus:border-emerald-400" />
+              {whatsAppResult && <p className="mt-3 text-sm text-slate-300">{whatsAppResult}</p>}
+              <div className="mt-4 flex gap-2">
+                <Button disabled={whatsAppBusy || whatsAppPhone.replace(/\D/g, "").length < 10} onClick={() => void sendWhatsApp()} className="flex-1 bg-emerald-600 hover:bg-emerald-500">{whatsAppBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enviar"}</Button>
+                <Button variant="outline" className="border-white/15 bg-white/5 text-white" onClick={() => setWhatsAppOrder(null)}>Fechar</Button>
+              </div>
+            </div>
           </div>
         )}
       </main>

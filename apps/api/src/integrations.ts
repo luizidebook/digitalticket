@@ -37,6 +37,45 @@ export function createTicketSecret() { const rawToken = randomBytes(32).toString
 export function verifyTicketToken(signedToken: string) { const [rawToken, signature] = signedToken.split("."); if (!rawToken || !signature) return null; const expected = createHmac("sha256", ticketSigningSecret()).update(rawToken).digest("base64url"); if (signature.length !== expected.length || !timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null; return rawToken; }
 export async function createTicketQrDataUrl(signedToken: string) { return QRCode.toDataURL(`digitalticket://ticket/${signedToken}`, { width: 640, margin: 2, errorCorrectionLevel: "H" }); }
 export interface VoucherMailer { sendVoucher(input: { recipient: string; subject: string; ticketQrDataUrl: string; checkInCode: string; holderName: string; eventName: string }): Promise<void>; }
+
+export function normalizeBrazilianPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 10) throw new Error("INVALID_PHONE");
+  return digits.startsWith("55") ? digits : `55${digits}`;
+}
+
+export function buildWhatsAppVoucherMessage(input: { holderName: string; eventName: string; checkInCode: string; orderUrl?: string }) {
+  const lines = [
+    `Olá ${input.holderName}! Seu ingresso para *${input.eventName}* está confirmado.`,
+    `Código de entrada: *${input.checkInCode}*`,
+    "Apresente o QR Code do voucher na portaria.",
+  ];
+  if (input.orderUrl) lines.push(`Acesse seu voucher: ${input.orderUrl}`);
+  return lines.join("\n");
+}
+
+export interface VoucherWhatsAppSender { sendVoucher(input: { phone: string; holderName: string; eventName: string; checkInCode: string; orderUrl?: string }): Promise<void>; }
+
+export class ConfiguredWhatsAppSender implements VoucherWhatsAppSender {
+  async sendVoucher(input: { phone: string; holderName: string; eventName: string; checkInCode: string; orderUrl?: string }) {
+    const token = process.env.WHATSAPP_ACCESS_TOKEN;
+    const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+    if (!token || !phoneNumberId) throw new Error("WHATSAPP_NOT_CONFIGURED");
+    const to = normalizeBrazilianPhone(input.phone);
+    const response = await fetch(`https://graph.facebook.com/v21.0/${phoneNumberId}/messages`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        to,
+        type: "text",
+        text: { preview_url: true, body: buildWhatsAppVoucherMessage(input) },
+      }),
+    });
+    const data = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(`WHATSAPP_${response.status}:${JSON.stringify(data)}`);
+  }
+}
 export class ConfiguredVoucherMailer implements VoucherMailer {
   async sendVoucher(input: { recipient: string; subject: string; ticketQrDataUrl: string; checkInCode: string; holderName: string; eventName: string }) {
     if (!process.env.MAIL_FROM || !process.env.SMTP_URL) throw new Error("MAILER_NOT_CONFIGURED");
