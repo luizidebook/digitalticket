@@ -18,10 +18,11 @@ A plataforma já cobre o ciclo completo de venda e entrada: autenticação JWT/R
 | management | `/api/v1/manage/*` | Pedidos, clientes e cupons do organizador com busca e paginação |
 | reports | `/api/v1/reports/*` | Resumo, métricas por evento, exportações CSV (pedidos, clientes, ingressos) |
 | branding | `/api/v1/tenant/branding`, `/api/v1/public/tenants/*` | White-label: resolução por slug/domínio, logo e cores persistidas |
+| WhatsApp | `/api/v1/manage/orders/:orderId/send-whatsapp` | Reenvio de códigos de ingresso pela WhatsApp Cloud API |
 
 ### Telas web (`client/`)
 
-Dashboard do organizador (`/`), criação de eventos (`/events/new`), pedidos (`/orders`), clientes (`/customers`), cupons (`/coupons`), relatórios (`/reports`), marca white-label (`/branding`), check-in (`/check-in`), painel super-admin (`/admin`), página pública do organizador (`/t/:slug`) e checkout (`/event/demo`).
+Dashboard do organizador (`/`), login/cadastro (`/login`), listagem de eventos (`/events`), criação/edição de eventos e lotes (`/events/new`, `/events/:id/edit`), pedidos (`/orders`), clientes (`/customers`), cupons (`/coupons`), relatórios (`/reports`), marca white-label (`/branding`), check-in (`/check-in`), painel super-admin (`/admin`), página pública do organizador (`/t/:slug`) e checkout (`/event/demo`).
 
 | Camada | Local | Situação |
 |---|---|---|
@@ -44,6 +45,8 @@ pnpm test
 
 A API separada pode ser executada com `pnpm --filter @digitalticket/api dev` depois que o cliente Prisma for gerado e as variáveis locais forem configuradas. Para popular o banco com super-admin, organização demo, organizador e evento publicado, execute `pnpm --filter @digitalticket/api seed`. Os testes end-to-end com PostgreSQL real e o contrato do gateway Mercado Pago estão documentados em `docs/e2e-testing.md`.
 
+A documentação interativa da API fica em `http://localhost:4000/api/docs`, com o documento JSON em `http://localhost:4000/api/openapi.json` e a especificação versionada em [`docs/openapi.yaml`](docs/openapi.yaml). O workflow CI/CD está salvo em [`docs/ci-github-actions.yml`](docs/ci-github-actions.yml), pronto para ser copiado para `.github/workflows/ci.yml` por um mantenedor com permissão `workflow`. Ele executa instalação reproduzível, geração do Prisma Client, migrations, typecheck, lint, testes, builds web/API e validação estrutural do OpenAPI em cada push ou pull request para `main`.
+
 ## Variáveis de ambiente
 
 Nunca commite valores reais. Para a API separada, use um arquivo `.env` local fora do controle de versão:
@@ -54,6 +57,9 @@ JWT_SECRET=troque-por-um-segredo-longo
 MERCADO_PAGO_ACCESS_TOKEN=seu-token-de-sandbox
 MERCADO_PAGO_WEBHOOK_SECRET=segredo-do-webhook
 MAIL_FROM=no-reply@seudominio.com
+WHATSAPP_ACCESS_TOKEN=token-da-whatsapp-cloud-api
+WHATSAPP_PHONE_NUMBER_ID=id-do-numero-whatsapp
+PUBLIC_WEB_URL=https://tickets.seudominio.com
 PORT=4000
 ```
 

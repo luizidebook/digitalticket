@@ -109,7 +109,7 @@ describe("ticket issuance and check-in concurrency (PostgreSQL real)", () => {
     await issueTicketsForApprovedOrder(order.id);
     const ticket = await prisma.ticket.findFirstOrThrow({ where: { orderItem: { orderId: order.id } } });
     expect(ticket.qrTokenHash).toMatch(/^[0-9a-f]{64}$/);
-    expect(ticket.checkInCode).toMatch(/^DT-[A-Z0-9-]+$/);
+    expect(ticket.checkInCode).toMatch(/^DT-[A-Z0-9_-]+$/);
     const secret = createTicketSecret();
     expect(createHash("sha256").update(secret.rawToken).digest("hex")).toBe(secret.tokenHash);
   });

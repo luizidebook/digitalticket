@@ -1,0 +1,102 @@
+name: DigitalTicket CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digitalticket-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DATABASE_URL: postgresql://digitalticket:digitalticket_dev@localhost:5432/digitalticket
+  JWT_SECRET: ci-jwt-secret
+  TICKET_SIGNING_SECRET: ci-ticket-signing-secret
+  CHECKPOINT_DISABLE: '1'
+
+jobs:
+  quality:
+    name: Typecheck, lint, tests and builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: digitalticket
+          POSTGRES_PASSWORD: digitalticket_dev
+          POSTGRES_DB: digitalticket
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U digitalticket -d digitalticket"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm --filter @digitalticket/api exec prisma generate
+
+      - name: Apply database migrations
+        run: pnpm --filter @digitalticket/api exec prisma migrate deploy
+
+      - name: Typecheck
+        run: pnpm check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Tests
+        run: pnpm test
+
+      - name: Build web application
+        run: pnpm build
+
+      - name: Build API
+        run: pnpm --filter @digitalticket/api build
+
+  openapi:
+    name: Validate OpenAPI document
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate OpenAPI syntax and required sections
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const text = fs.readFileSync('docs/openapi.yaml', 'utf8');
+          for (const required of ['openapi: 3.0.3', 'info:', 'paths:', 'components:', 'securitySchemes:', 'bearerAuth:']) {
+            if (!text.includes(required)) throw new Error(`OpenAPI missing ${required}`);
+          }
+          const pathCount = (text.match(/^  \/[^:]+:/gm) || []).length;
+          if (pathCount < 20) throw new Error(`Expected at least 20 documented paths, got ${pathCount}`);
+          console.log(`OpenAPI document looks valid (${pathCount} paths).`);
+          NODE

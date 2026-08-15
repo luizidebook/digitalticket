@@ -13,7 +13,7 @@
 - [x] Implementar cadastro, login, access token JWT, refresh token rotativo e logout.
 - [x] Implementar middleware de autenticação e autorização baseada em papéis.
 - [x] Implementar CRUD de eventos/produtos com tipo, categoria, tags, descrição, imagens, status e publicação.
-- [ ] Implementar datas únicas, múltiplas e produtos sem data definida.
+- [x] Implementar datas únicas, múltiplas e produtos sem data definida.
 - [x] Implementar CRUD de lotes com preço, capacidade, vigência e quantidade máxima por pedido.
 - [x] Implementar reserva transacional de estoque para impedir overselling.
 - [x] Modelar compradores, pedidos, itens, pagamentos, tickets, check-ins e cupons.
@@ -29,10 +29,10 @@
 - [x] Configurar o app Expo para escaneamento de QR Code e consulta à API.
 - [x] Criar identidade visual escura, moderna e própria para o painel SaaS.
 - [x] Implementar tokens de tema white-label por organizador no frontend público.
-- [ ] Criar páginas web de login e cadastro.
+- [x] Criar páginas web de login e cadastro.
 - [x] Criar dashboard do organizador com KPIs de vendas, receita e check-ins.
-- [ ] Criar tela de listagem e formulário de criação/edição de eventos.
-- [ ] Criar tela de gestão de lotes e capacidade.
+- [x] Criar tela de listagem e formulário de criação/edição de eventos.
+- [x] Criar tela de gestão de lotes e capacidade.
 - [x] Criar página pública white-label do evento com data, lote e quantidade.
 - [x] Criar formulário do comprador com aceite de termos.
 - [x] Criar interface de checkout PIX/cartão e estados de pagamento.
@@ -42,9 +42,9 @@
 - [x] Criar relatórios exportáveis de vendas e check-ins.
 - [x] Criar painel super-admin para organizações, taxas e KPIs consolidados.
 - [x] Adicionar testes unitários para autenticação, tenancy, estoque, QR Code, webhook e check-in.
-- [ ] Adicionar testes de componentes e fluxos críticos do frontend.
+- [x] Adicionar testes de componentes e fluxos críticos do frontend.
 - [x] Executar typecheck, lint, testes e builds de todas as aplicações.
-- [ ] Validar visualmente as páginas principais em desktop e mobile.
+- [x] Validar visualmente as páginas principais em desktop e mobile.
 - [x] Criar commits incrementais por marco funcional e enviar ao GitHub.
 - [x] Preparar documentação final com execução local, arquitetura e próximos passos.
 - [x] Integrar o SDK/API oficial do Mercado Pago para criar pagamentos PIX e cartão com idempotency key e external reference do pedido.
@@ -61,4 +61,7 @@
 - [x] Implementar cancelamento persistente de ticket e teste da transição CANCELLED.
 - [x] Conectar a tela web de check-in ao endpoint real e exibir estados aprovado, usado, cancelado e inválido.
 - [x] Completar o checkout com área pós-compra, consulta de pedido e acesso aos tickets/QR Codes.
-- [ ] Adicionar testes de webhook, emissão de tickets e concorrência de check-in.
+- [x] Implementar reenvio de ingressos por WhatsApp Cloud API com normalização de telefones, endpoint protegido e ação na tela de pedidos.
+- [x] Criar workflow GitHub Actions para migrations, typecheck, lint, testes e builds web/API.
+- [x] Documentar a API com OpenAPI 3.0.3, Swagger UI em `/api/docs` e JSON em `/api/openapi.json`.
+- [x] Adicionar testes de webhook, emissão de tickets e concorrência de check-in.

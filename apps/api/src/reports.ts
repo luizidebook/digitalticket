@@ -14,7 +14,7 @@ export function buildDailySalesSeries(orders: Array<{ createdAt: Date; totalCent
     const point = series.get(key);
     if (point) { point.orders += 1; point.revenueCents += order.totalCents; }
   }
-  return [...series.values()];
+  return Array.from(series.values());
 }
 
 export function escapeCsvCell(value: unknown): string {
