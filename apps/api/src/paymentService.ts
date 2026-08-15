@@ -17,6 +17,8 @@ export async function createMercadoPagoPayment(input: { orderId: string; method:
 async function issueTicketsForApprovedOrder(orderId: string) {
   const pendingEmails: Array<{ recipient: string; subject: string; ticketQrDataUrl: string; checkInCode: string; holderName: string; eventName: string }> = [];
   const result = await prisma.$transaction(async (tx) => {
+    // Lock the order row so concurrent webhook/polling calls serialize here instead of double-issuing tickets.
+    await tx.$executeRaw`SELECT id FROM "Order" WHERE id = ${orderId} FOR UPDATE`;
     const order = await tx.order.findUnique({ where: { id: orderId }, include: { items: { include: { tickets: true } }, event: true, buyer: true } });
     if (!order) throw new Error("ORDER_NOT_FOUND");
     if (order.status === "PAID" && order.items.every((item) => item.tickets.length >= item.quantity)) return order;
