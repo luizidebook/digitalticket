@@ -19,7 +19,20 @@ export const lotInputSchema = z.object({
   saleStartsAt: z.coerce.date().optional(),
   saleEndsAt: z.coerce.date().optional(),
   maxPerOrder: z.number().int().positive().max(50).default(10),
+  eventDateId: z.string().trim().min(1).nullish(),
 });
+
+export const eventDateInputSchema = z.object({
+  label: z.string().trim().max(80).nullish(),
+  startsAt: z.coerce.date().nullish(),
+  endsAt: z.coerce.date().nullish(),
+  sortOrder: z.number().int().min(0).default(0),
+  active: z.boolean().default(true),
+});
+
+export function assertEventDateWindow(input: { startsAt?: Date | null; endsAt?: Date | null }) {
+  if (input.startsAt && input.endsAt && input.endsAt < input.startsAt) throw new Error("EVENT_DATE_END_BEFORE_START");
+}
 
 export function assertLotAvailable(input: { capacity: number; sold: number; quantity: number; maxPerOrder: number }) {
   if (input.quantity < 1) throw new Error("QUANTITY_MUST_BE_POSITIVE");

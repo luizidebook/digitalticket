@@ -94,6 +94,7 @@ model Event {
   endsAt         DateTime?
   status         EventStatus  @default(DRAFT)
   publishedAt    DateTime?
+  dates          EventDate[]
   lots           Lot[]
   orders         Order[]
   createdAt      DateTime     @default(now())
@@ -103,10 +104,27 @@ model Event {
   @@index([organizationId, status])
 }
 
+model EventDate {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  label     String?
+  startsAt  DateTime?
+  endsAt    DateTime?
+  sortOrder Int      @default(0)
+  active    Boolean  @default(true)
+  lots      Lot[]
+  createdAt DateTime @default(now())
+
+  @@index([eventId, active, sortOrder])
+}
+
 model Lot {
   id           String      @id @default(cuid())
   eventId      String
   event        Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventDateId  String?
+  eventDate    EventDate?  @relation(fields: [eventDateId], references: [id], onDelete: SetNull)
   name         String
   priceInCents Int
   capacity     Int
@@ -121,6 +139,7 @@ model Lot {
   updatedAt    DateTime    @updatedAt
 
   @@index([eventId, active, sortOrder])
+  @@index([eventDateId])
 }
 
 model Coupon {
