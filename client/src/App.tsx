@@ -10,6 +10,9 @@ import CheckIn from "./pages/CheckIn";
 import BuyerOrder from "./pages/BuyerOrder";
 import PublicEvent from "./pages/PublicEvent";
 import Admin from "./pages/Admin";
+import Orders from "./pages/Orders";
+import Customers from "./pages/Customers";
+import Coupons from "./pages/Coupons";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -21,6 +24,9 @@ function Router() {
       <Route path="/buyer/orders/:orderId" component={BuyerOrder} />
       <Route path={"/event/demo"} component={PublicEvent} />
       <Route path={"/admin"} component={Admin} />
+      <Route path={"/orders"} component={Orders} />
+      <Route path={"/customers"} component={Customers} />
+      <Route path={"/coupons"} component={Coupons} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
