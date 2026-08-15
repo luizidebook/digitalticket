@@ -277,6 +277,36 @@ paths:
         '200': { description: Webhook recebido/processado }
         '202': { description: Recebido, reconciliação pendente }
         '401': { $ref: '#/components/responses/Error' }
+  /api/v1/check-in/catalog:
+    get:
+      tags: [Check-in]
+      summary: Baixa catálogo de ingressos para cache offline e busca manual
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: eventId, in: query, schema: { type: string } }
+        - { name: search, in: query, schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 2000, default: 500 } }
+      responses:
+        '200': { description: Ingressos com hash QR e status }
+        '403': { $ref: '#/components/responses/Error' }
+  /api/v1/check-in/stats:
+    get:
+      tags: [Check-in]
+      summary: Retorna entradas versus total vendido
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: eventId, in: query, schema: { type: string } }
+      responses:
+        '200': { description: Estatísticas em tempo real }
+  /api/v1/check-in/history:
+    get:
+      tags: [Check-in]
+      summary: Lista o histórico do operador autenticado
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 100 } }
+      responses:
+        '200': { description: Leituras recentes }
   /api/v1/check-in/validate:
     post:
       tags: [Check-in]

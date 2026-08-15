@@ -28,7 +28,7 @@ Dashboard do organizador (`/`), login/cadastro (`/login`), listagem de eventos (
 |---|---|---|
 | Web | `client/` e `apps/web/` | Dashboard inicial, login OAuth do scaffold e tema escuro |
 | API | `server/` e `apps/api/` | Base Express, schema Prisma, auth primitives e regras de domínio |
-| Mobile | `apps/mobile/` | Tela Expo preparada para fluxo de check-in |
+| Mobile | `apps/mobile/` | Check-in Expo com câmera, cache offline, histórico do operador, feedback sonoro/vibração, lista com busca e estatísticas em tempo real |
 | Compartilhado | `packages/shared/` e `packages/ui/` | Tipos, estados, tema e contratos de UI |
 | Banco | `apps/api/prisma/schema.prisma` | PostgreSQL modelado para multi-tenancy e transações |
 
@@ -60,6 +60,9 @@ MAIL_FROM=no-reply@seudominio.com
 WHATSAPP_ACCESS_TOKEN=token-da-whatsapp-cloud-api
 WHATSAPP_PHONE_NUMBER_ID=id-do-numero-whatsapp
 PUBLIC_WEB_URL=https://tickets.seudominio.com
+EXPO_PUBLIC_API_URL=http://192.168.0.10:4000
+EXPO_PUBLIC_OPERATOR_TOKEN=jwt-do-operador
+EXPO_PUBLIC_DEVICE_ID=portaria-01
 PORT=4000
 ```
 

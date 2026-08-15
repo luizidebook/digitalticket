@@ -9,6 +9,49 @@ const prisma = new PrismaClient();
 const inputSchema = z.object({ code: z.string().trim().min(4), eventId: z.string().optional(), deviceId: z.string().max(120).optional(), consume: z.boolean().default(true), note: z.string().max(300).optional() });
 
 export function registerCheckinRoutes(router: Router) {
+  const catalogQuerySchema = z.object({ eventId: z.string().optional(), search: z.string().trim().max(120).optional(), limit: z.coerce.number().int().min(1).max(2000).default(500) });
+  const operatorQuerySchema = z.object({ limit: z.coerce.number().int().min(1).max(200).default(100) });
+  const scopedTicketWhere = (session: { role: string; organizationId?: string }, eventId?: string) => {
+    const eventWhere: Record<string, string> = {};
+    if (session.role !== "SUPER_ADMIN" && session.organizationId) eventWhere.organizationId = session.organizationId;
+    if (eventId) eventWhere.id = eventId;
+    return Object.keys(eventWhere).length ? { orderItem: { order: { event: eventWhere } } } : {};
+  };
+
+  router.get("/api/v1/check-in/catalog", async (req: Request, res: Response) => {
+    const session = await authenticateRequest(req); if (!session) return res.status(401).json({ error: "UNAUTHORIZED" });
+    if (!["ORGANIZER", "SUPER_ADMIN"].includes(session.role)) return res.status(403).json({ error: "FORBIDDEN" });
+    const parsed = catalogQuerySchema.safeParse(req.query); if (!parsed.success) return res.status(400).json({ error: "INVALID_CATALOG_QUERY" });
+    const where: any = scopedTicketWhere(session, parsed.data.eventId);
+    if (parsed.data.search) where.OR = [{ holderName: { contains: parsed.data.search, mode: "insensitive" } }, { holderEmail: { contains: parsed.data.search, mode: "insensitive" } }, { checkInCode: { contains: parsed.data.search.toUpperCase() } }];
+    const tickets = await prisma.ticket.findMany({ where, take: parsed.data.limit, orderBy: { issuedAt: "desc" }, select: { id: true, holderName: true, holderEmail: true, checkInCode: true, qrTokenHash: true, status: true, issuedAt: true, validatedAt: true, usedAt: true, cancelledAt: true, orderItem: { select: { order: { select: { event: { select: { id: true, name: true } } } } } } } });
+    return res.json({ generatedAt: new Date().toISOString(), total: tickets.length, tickets: tickets.map((ticket) => ({ id: ticket.id, holderName: ticket.holderName, holderEmail: ticket.holderEmail, checkInCode: ticket.checkInCode, qrTokenHash: ticket.qrTokenHash, status: ticket.status, issuedAt: ticket.issuedAt, validatedAt: ticket.validatedAt, usedAt: ticket.usedAt, cancelledAt: ticket.cancelledAt, eventId: ticket.orderItem.order.event.id, eventName: ticket.orderItem.order.event.name })) });
+  });
+
+  router.get("/api/v1/check-in/stats", async (req: Request, res: Response) => {
+    const session = await authenticateRequest(req); if (!session) return res.status(401).json({ error: "UNAUTHORIZED" });
+    if (!["ORGANIZER", "SUPER_ADMIN"].includes(session.role)) return res.status(403).json({ error: "FORBIDDEN" });
+    const eventId = typeof req.query.eventId === "string" ? req.query.eventId : undefined;
+    const scope: any = scopedTicketWhere(session, eventId);
+    const [totalSold, entered, issued, validated, cancelled] = await Promise.all([
+      prisma.ticket.count({ where: scope }),
+      prisma.ticket.count({ where: { ...scope, status: "USED" } }),
+      prisma.ticket.count({ where: { ...scope, status: "ISSUED" } }),
+      prisma.ticket.count({ where: { ...scope, status: "VALIDATED" } }),
+      prisma.ticket.count({ where: { ...scope, status: "CANCELLED" } }),
+    ]);
+    return res.json({ generatedAt: new Date().toISOString(), totalSold, entered, remaining: Math.max(0, totalSold - entered), issued, validated, cancelled, entryRate: totalSold ? Math.round((entered / totalSold) * 10000) / 100 : 0 });
+  });
+
+  router.get("/api/v1/check-in/history", async (req: Request, res: Response) => {
+    const session = await authenticateRequest(req); if (!session) return res.status(401).json({ error: "UNAUTHORIZED" });
+    if (!["ORGANIZER", "SUPER_ADMIN"].includes(session.role)) return res.status(403).json({ error: "FORBIDDEN" });
+    const parsed = operatorQuerySchema.safeParse(req.query); if (!parsed.success) return res.status(400).json({ error: "INVALID_HISTORY_QUERY" });
+    const ticketScope: any = scopedTicketWhere(session);
+    const history = await prisma.checkIn.findMany({ where: { operatorId: session.userId, ...(ticketScope.orderItem ? { ticket: { orderItem: ticketScope.orderItem } } : {}) }, take: parsed.data.limit, orderBy: { createdAt: "desc" }, include: { ticket: { select: { id: true, holderName: true, holderEmail: true, checkInCode: true, status: true } } } });
+    return res.json(history);
+  });
+
   router.post("/api/v1/tickets/:ticketId/cancel", async (req: Request, res: Response) => {
     const session = await authenticateRequest(req); if (!session) return res.status(401).json({ error: "UNAUTHORIZED" });
     if (!["ORGANIZER", "SUPER_ADMIN"].includes(session.role)) return res.status(403).json({ error: "FORBIDDEN" });
