@@ -17,13 +17,16 @@ import Reports from "./pages/Reports";
 import Branding from "./pages/Branding";
 import TenantPublic from "./pages/TenantPublic";
 import Login from "./pages/Login";
+import Events from "./pages/Events";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/events"} component={Events} />
       <Route path={"/events/new"} component={EventStudio} />
+      <Route path={"/events/:eventId/edit"} component={EventStudio} />
       <Route path="/check-in" component={CheckIn} />
       <Route path="/buyer/orders/:orderId" component={BuyerOrder} />
       <Route path={"/event/demo"} component={PublicEvent} />

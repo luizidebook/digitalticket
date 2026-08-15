@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 
 const navItems = [
   { label: "Visão geral", icon: LayoutDashboard, active: true, href: "/" },
-  { label: "Eventos", icon: CalendarDays, href: "/events/new" },
+  { label: "Eventos", icon: CalendarDays, href: "/events" },
   { label: "Pedidos", icon: Ticket, href: "/orders" },
   { label: "Check-in", icon: QrCode, href: "/check-in" },
   { label: "Clientes", icon: Users, href: "/customers" },
