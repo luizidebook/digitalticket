@@ -9,6 +9,7 @@ import EventStudio from "./pages/EventStudio";
 import CheckIn from "./pages/CheckIn";
 import BuyerOrder from "./pages/BuyerOrder";
 import PublicEvent from "./pages/PublicEvent";
+import Admin from "./pages/Admin";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/check-in" component={CheckIn} />
       <Route path="/buyer/orders/:orderId" component={BuyerOrder} />
       <Route path={"/event/demo"} component={PublicEvent} />
+      <Route path={"/admin"} component={Admin} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
