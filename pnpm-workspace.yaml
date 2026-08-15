@@ -9,4 +9,6 @@ onlyBuiltDependencies:
   - bcrypt
   - prisma
   - '@prisma/client'
+  - '@prisma/engines'
+  - argon2
 
