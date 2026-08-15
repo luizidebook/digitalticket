@@ -4,7 +4,24 @@ Plataforma SaaS multi-tenant e white-label para venda de ingressos, gestão de e
 
 ## Estado atual
 
-A fundação do projeto está pronta para evolução incremental. O repositório já possui estrutura pnpm workspace, PostgreSQL local, schema Prisma com os domínios principais, contratos compartilhados, base do servidor API, helpers de JWT/refresh, contratos de integração e uma experiência web inicial em tema escuro moderno. O runtime web executável continua sendo o scaffold fullstack gerenciado, enquanto `apps/api` concentra a separação alvo do backend Node/Express/Prisma/PostgreSQL.
+A plataforma já cobre o ciclo completo de venda e entrada: autenticação JWT/RBAC, multi-tenancy, CRUD de eventos e lotes, reserva transacional de estoque, checkout Mercado Pago (PIX + cartão) com webhook autenticado e reconciliação, emissão de tickets com QR Code assinado, check-in persistente, painel super-admin, gestão de pedidos/clientes/cupons, relatórios com exportação CSV e white-label por organização. O runtime web executável continua sendo o scaffold fullstack gerenciado (`client/` + `server/`), enquanto `apps/api` concentra o backend Node/Express/Prisma/PostgreSQL.
+
+### Módulos da API (`apps/api`)
+
+| Módulo | Rotas | Descrição |
+|---|---|---|
+| auth | `/api/v1/auth/*` | Registro, login, refresh rotativo, logout |
+| events | `/api/v1/events`, `/api/v1/public/events/*` | CRUD de eventos/lotes com escopo por organização e página pública |
+| orders/payments | `/api/v1/orders*` | Pedido com cupom, pagamento PIX/cartão, polling de status |
+| check-in | `/api/v1/check-in/*`, `/api/v1/tickets/:id/cancel` | Validação por QR/código com histórico persistente |
+| admin | `/api/v1/admin/*` | Super-admin: organizações, organizadores, taxas, métricas consolidadas |
+| management | `/api/v1/manage/*` | Pedidos, clientes e cupons do organizador com busca e paginação |
+| reports | `/api/v1/reports/*` | Resumo, métricas por evento, exportações CSV (pedidos, clientes, ingressos) |
+| branding | `/api/v1/tenant/branding`, `/api/v1/public/tenants/*` | White-label: resolução por slug/domínio, logo e cores persistidas |
+
+### Telas web (`client/`)
+
+Dashboard do organizador (`/`), criação de eventos (`/events/new`), pedidos (`/orders`), clientes (`/customers`), cupons (`/coupons`), relatórios (`/reports`), marca white-label (`/branding`), check-in (`/check-in`), painel super-admin (`/admin`), página pública do organizador (`/t/:slug`) e checkout (`/event/demo`).
 
 | Camada | Local | Situação |
 |---|---|---|
@@ -25,7 +42,7 @@ pnpm check
 pnpm test
 ```
 
-A API separada pode ser executada com `pnpm --filter @digitalticket/api dev` depois que o cliente Prisma for gerado e as variáveis locais forem configuradas.
+A API separada pode ser executada com `pnpm --filter @digitalticket/api dev` depois que o cliente Prisma for gerado e as variáveis locais forem configuradas. Para popular o banco com super-admin, organização demo, organizador e evento publicado, execute `pnpm --filter @digitalticket/api seed`. Os testes end-to-end com PostgreSQL real e o contrato do gateway Mercado Pago estão documentados em `docs/e2e-testing.md`.
 
 ## Variáveis de ambiente
 
