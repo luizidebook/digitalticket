@@ -6,6 +6,7 @@ import { registerPaymentRoutes } from "./paymentRoutes";
 import { registerCheckinRoutes } from "./checkinRoutes";
 import { registerAdminRoutes } from "./adminRoutes";
 import { registerManagementRoutes } from "./managementRoutes";
+import { registerReportRoutes } from "./reportRoutes";
 
 const app = express();
 app.use(express.json());
@@ -16,6 +17,7 @@ registerPaymentRoutes(app);
 registerCheckinRoutes(app);
 registerAdminRoutes(app);
 registerManagementRoutes(app);
+registerReportRoutes(app);
 
 app.get("/health", (_req, res) => {
   res.json({ service: "digitalticket-api", status: "ok", version: "0.1.0" });
@@ -24,7 +26,7 @@ app.get("/health", (_req, res) => {
 app.get("/api/v1", (_req, res) => {
   res.json({
     name: "DigitalTicket API",
-    modules: ["auth", "tenants", "events", "orders", "payments", "tickets", "check-in", "admin", "management", "coupons"],
+    modules: ["auth", "tenants", "events", "orders", "payments", "tickets", "check-in", "admin", "management", "coupons", "reports"],
   });
 });
 
