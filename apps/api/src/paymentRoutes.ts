@@ -7,7 +7,7 @@ import { createPendingOrder } from "./orderService";
 import { createMercadoPagoPayment, reconcileMercadoPagoPayment } from "./paymentService";
 
 const prisma = new PrismaClient();
-const orderSchema = z.object({ organizationId: z.string().min(1), eventId: z.string().min(1), lines: z.array(z.object({ lotId: z.string().min(1), quantity: z.number().int().positive() })).min(1), discountCents: z.number().int().nonnegative().default(0) });
+const orderSchema = z.object({ organizationId: z.string().min(1), eventId: z.string().min(1), lines: z.array(z.object({ lotId: z.string().min(1), quantity: z.number().int().positive() })).min(1), discountCents: z.number().int().nonnegative().default(0), couponCode: z.string().trim().min(3).max(32).optional() });
 const paymentSchema = z.object({ method: z.enum(["PIX", "CREDIT_CARD"]), payerEmail: z.string().email(), card: z.object({ token: z.string().min(1), installments: z.number().int().positive().max(24), paymentMethodId: z.string().min(1), issuerId: z.string().optional() }).optional() });
 
 async function buyer(req: Request, res: Response) {
