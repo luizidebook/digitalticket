@@ -3,7 +3,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, ChevronRight, CircleDollarSign, LayoutDashboard, LogOut, Percent, QrCode, Ticket, Users, Zap } from "lucide-react";
+import { BarChart3, CalendarDays, ChevronRight, CircleDollarSign, LayoutDashboard, LogOut, Percent, QrCode, Ticket, Users, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const navItems = [
@@ -13,6 +13,7 @@ const navItems = [
   { label: "Check-in", icon: QrCode, href: "/check-in" },
   { label: "Clientes", icon: Users, href: "/customers" },
   { label: "Cupons", icon: Percent, href: "/coupons" },
+  { label: "Relatórios", icon: BarChart3, href: "/reports" },
 ];
 
 type OrganizerEvent = { id: string; name: string; status: string; lots: Array<{ capacity: number; sold: number }> };

@@ -26,7 +26,7 @@ export function escapeCsvCell(value: unknown): string {
 export function toCsv(headers: readonly string[], rows: ReadonlyArray<readonly unknown[]>): string {
   const lines = [headers.map(escapeCsvCell).join(",")];
   for (const row of rows) lines.push(row.map(escapeCsvCell).join(","));
-  return `﻿${lines.join("\n")}`;
+  return `\uFEFF${lines.join("\n")}`;
 }
 
 export type EventReport = {

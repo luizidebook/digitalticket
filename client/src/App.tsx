@@ -13,6 +13,7 @@ import Admin from "./pages/Admin";
 import Orders from "./pages/Orders";
 import Customers from "./pages/Customers";
 import Coupons from "./pages/Coupons";
+import Reports from "./pages/Reports";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -27,6 +28,7 @@ function Router() {
       <Route path={"/orders"} component={Orders} />
       <Route path={"/customers"} component={Customers} />
       <Route path={"/coupons"} component={Coupons} />
+      <Route path={"/reports"} component={Reports} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
