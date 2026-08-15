@@ -14,6 +14,8 @@ import Orders from "./pages/Orders";
 import Customers from "./pages/Customers";
 import Coupons from "./pages/Coupons";
 import Reports from "./pages/Reports";
+import Branding from "./pages/Branding";
+import TenantPublic from "./pages/TenantPublic";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -29,6 +31,8 @@ function Router() {
       <Route path={"/customers"} component={Customers} />
       <Route path={"/coupons"} component={Coupons} />
       <Route path={"/reports"} component={Reports} />
+      <Route path={"/branding"} component={Branding} />
+      <Route path={"/t/:slug"} component={TenantPublic} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
